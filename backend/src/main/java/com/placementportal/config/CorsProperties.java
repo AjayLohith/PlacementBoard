@@ -16,7 +16,10 @@ public class CorsProperties {
      * Example: {@code https://*.vercel.app,http://localhost:5173}
      */
     // Provide sensible defaults for local development and the deployed frontend/backends.
-    private String allowedOriginPatterns = "https://placement-board-six.vercel.app,https://placementboard.onrender.com";
+    private String allowedOriginPatterns =
+            "https://placement-board-six.vercel.app," +
+                    "https://placementboard.onrender.com," +
+                    "https://*.vercel.app";
 
     public String getAllowedOriginPatterns() {
         return allowedOriginPatterns;

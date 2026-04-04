@@ -70,27 +70,36 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        List<String> patterns = corsProperties.allowedOriginPatternsList();
-        if (patterns.isEmpty()) {
-            log.warn(
-                    "CORS allowed origins are not set (CORS_ALLOWED_ORIGINS / app.cors.allowed-origin-patterns). "
-                            + "Browsers will block cross-origin API calls until you set your frontend origin(s).");
-        }
-        configuration.setAllowedOriginPatterns(patterns.isEmpty() ? List.of() : patterns);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedOriginPatterns(List.of(
+                "https://*.vercel.app",
+                "https://placementboard.onrender.com",
+                "http://localhost:5173",
+                "http://localhost:3000"
+        ));
+
+        configuration.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+        ));
+
         configuration.setAllowedHeaders(List.of(
                 "Authorization",
                 "Content-Type",
                 "X-Requested-With",
                 "Accept",
-                "Origin",
-                "Access-Control-Request-Method",
-                "Access-Control-Request-Headers"));
+                "Origin"
+        ));
+
         configuration.setExposedHeaders(List.of("Authorization"));
-        configuration.setMaxAge(3600L);
+
+        // If using JWT in Authorization header → keep false
+        // If using cookies → change to true
         configuration.setAllowCredentials(false);
+
+        configuration.setMaxAge(3600L);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
+
         return source;
     }
 }
