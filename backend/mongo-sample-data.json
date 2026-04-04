@@ -1,0 +1,69 @@
+{
+  "description": "Example MongoDB documents for Compass / GUI insert. Replace ObjectIds and dates as needed. Database: placement-portal (or your MONGO_URI database name).",
+  "users": [
+    {
+      "name": "Sample User",
+      "email": "sample.user@gmail.com",
+      "password": "$2a$10$REPLACE_WITH_BCRYPT_HASH",
+      "createdAt": { "$date": "2026-01-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2026-01-01T00:00:00.000Z" }
+    }
+  ],
+  "companies": [
+    {
+      "name": "Acme Corp",
+      "slug": "acme-corp",
+      "logo": "https://placehold.co/80x80/e8f0fe/333?text=A"
+    }
+  ],
+  "experiences": [
+    {
+      "user": "PASTE_USER_ID",
+      "company": "PASTE_COMPANY_ID",
+      "postTitle": "Demo SDE interview write-up",
+      "interviewDate": { "$date": "2025-08-15T00:00:00.000Z" },
+      "interviewRounds": [
+        {
+          "roundName": "Technical",
+          "duration": "60 minutes",
+          "method": "Video call",
+          "focus": "DSA",
+          "keyQuestions": "Two array problems, one on binary search.",
+          "obstacles": "Clarified constraints late."
+        }
+      ],
+      "suggestions": "Practice timed problems.",
+      "additionalInfo": null,
+      "closingNote": "Good luck!",
+      "isApproved": true,
+      "rejected": false,
+      "createdAt": { "$date": "2026-01-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2026-01-01T00:00:00.000Z" }
+    }
+  ],
+  "job_postings": [
+    {
+      "title": "Frontend intern",
+      "companyName": "Demo Co",
+      "description": "React, Vite, and REST APIs.",
+      "applyLink": "https://example.com/jobs/1",
+      "location": "Hybrid",
+      "jobType": "intern",
+      "active": true,
+      "createdAt": { "$date": "2026-01-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2026-01-01T00:00:00.000Z" }
+    }
+  ],
+  "articles": [
+    {
+      "title": "Welcome to PlacementPedia",
+      "slug": "welcome-to-placementpedia",
+      "excerpt": "What this site is for.",
+      "body": "Students share interview experiences. Admins moderate posts, publish jobs, and articles.",
+      "published": true,
+      "publishedAt": { "$date": "2026-01-01T00:00:00.000Z" },
+      "createdAt": { "$date": "2026-01-01T00:00:00.000Z" },
+      "updatedAt": { "$date": "2026-01-01T00:00:00.000Z" }
+    }
+  ]
+}
