@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+
 @Service
 @RequiredArgsConstructor
 public class AdminAuthorizationService {
@@ -19,7 +21,7 @@ public class AdminAuthorizationService {
         if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
             throw new UnauthorizedException("Sign in required");
         }
-        boolean allowed = appProperties.getAdminEmails().stream()
+        boolean allowed = Arrays.stream(appProperties.getAdminEmails())
                 .anyMatch(e -> e.equalsIgnoreCase(principal.getEmail()));
         if (!allowed) {
             throw new ForbiddenException("Not authorized as an admin");
