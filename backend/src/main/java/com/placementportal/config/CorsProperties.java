@@ -15,7 +15,8 @@ public class CorsProperties {
      * Comma-separated origin patterns (same rules as Spring's {@code allowedOriginPatterns}).
      * Example: {@code https://*.vercel.app,http://localhost:5173}
      */
-    private String allowedOriginPatterns = "";
+    // Provide sensible defaults for local development and the deployed frontend/backends.
+    private String allowedOriginPatterns = "https://placement-board-six.vercel.app,https://placementboard.onrender.com";
 
     public String getAllowedOriginPatterns() {
         return allowedOriginPatterns;

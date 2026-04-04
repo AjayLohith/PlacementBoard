@@ -2,19 +2,25 @@ package com.placementportal.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
-    private List<String> adminEmails = new ArrayList<>();
+    private String[] adminEmails = new String[]{};
+    private String[] corsAllowedOrigins = new String[]{};
 
-    public List<String> getAdminEmails() {
+    public String[] getAdminEmails() {
         return adminEmails;
     }
 
-    public void setAdminEmails(List<String> adminEmails) {
+    public void setAdminEmails(String[] adminEmails) {
         this.adminEmails = adminEmails;
+    }
+
+    public String[] getCorsAllowedOrigins() {
+        return corsAllowedOrigins;
+    }
+
+    public void setCorsAllowedOrigins(String[] corsAllowedOrigins) {
+        this.corsAllowedOrigins = corsAllowedOrigins;
     }
 }
