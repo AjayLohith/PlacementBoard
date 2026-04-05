@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/backend/src/main/resources/application-dev.properties">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/backend/src/main/resources/application-dev.properties" />
+              <option name="originalContent" value="spring.config.activate.on-profile=dev&#10;&#10;# Dev Database Override&#10;spring.data.mongodb.uri=mongodb://localhost:27017/placement-portal&#10;&#10;# Dev Logging&#10;logging.level.root=INFO&#10;logging.level.com.placementportal=DEBUG&#10;&#10;# Dev JWT&#10;jwt.expiration=2592000000&#10;&#10;# Dev Email (optional - allow empty for local testing)&#10;spring.mail.username=${EMAIL_USER:}&#10;spring.mail.password=${EMAIL_PASS:}&#10;&#10;# Dev Demo Data&#10;app.seed-demo-data=true&#10;" />
+              <option name="updatedContent" value="spring.config.activate.on-profile=dev&#10;&#10;# Dev Database Override&#10;spring.data.mongodb.uri=mongodb://localhost:27017/placement-portal&#10;&#10;# Dev Logging&#10;logging.level.root=INFO&#10;logging.level.com.placementportal=DEBUG&#10;&#10;# Dev JWT&#10;jwt.expiration=2592000000&#10;&#10;# Dev Email - local safe defaults&#10;# For local testing you may set EMAIL_USER and EMAIL_PASS in your environment or .env file.&#10;# If EMAIL_USER is empty, the app will skip sending real emails in some code paths (see service checks).&#10;spring.mail.host=${EMAIL_HOST:smtp.gmail.com}&#10;spring.mail.port=${EMAIL_PORT:587}&#10;spring.mail.username=${EMAIL_USER:}&#10;spring.mail.password=${EMAIL_PASS:}&#10;spring.mail.properties.mail.smtp.auth=true&#10;spring.mail.properties.mail.smtp.starttls.enable=true&#10;spring.mail.properties.mail.smtp.starttls.required=true&#10;spring.mail.default-encoding=UTF-8&#10;&#10;# Dev Demo Data&#10;app.seed-demo-data=true" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
