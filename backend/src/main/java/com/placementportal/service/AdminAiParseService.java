@@ -8,6 +8,7 @@ import com.placementportal.config.AiProperties;
 import com.placementportal.dto.ArticleAiFillResponse;
 import com.placementportal.dto.JobPostingAiFillResponse;
 import com.placementportal.exception.ValidationException;
+import com.placementportal.util.JobAudienceTagResolver;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,12 @@ public class AdminAiParseService {
             location — city/region or Remote/Hybrid.
             jobType — one of: intern, full-time, part-time, contract (lowercase).
             skillsRequired — required skills, tools, languages, frameworks as a clear bullet-style or comma-separated block.
-            passoutYear — graduation / passout batches (e.g. "2025", "2024 and 2025", "2026 only").
+            passoutYear — graduation / passout batches for eligibility (e.g. "2025", "2024 and 2025", "2026 only").
+            qualificationMajor — degree or major if stated (e.g. "B.Tech", "B.E. Computer Science").
+            qualificationBranch — branch or stream (e.g. "CSE", "IT", "ECE") if stated.
+            qualificationYear — graduating batch year(s) for eligibility (e.g. "2025", "2024–2026").
+            experienceText — if the role is for fresh graduates, use exactly "Fresher"; otherwise a short line like "3 years backend Java" or "2+ years".
+            audienceTag — either "FRESHERS" or "EXPERIENCED": use FRESHERS for campus / new grad / 2024–2026 batch roles; EXPERIENCED when prior years of industry experience are required.
             postedOn — when posted or application deadline as short text (e.g. "Deadline: 15 Feb 2026" or "Posted January 2026").
             Output must be valid JSON: inside string values use \\n for line breaks in multiline fields (never raw newlines inside quotes). \
             JSON only. No markdown fences, no commentary.""";
@@ -84,7 +90,7 @@ public class AdminAiParseService {
             if (apply == null || apply.isBlank()) {
                 apply = firstUrlInText(trimmed);
             }
-            return JobPostingAiFillResponse.builder()
+            JobPostingAiFillResponse parsed = JobPostingAiFillResponse.builder()
                     .title(text(n, "title"))
                     .companyName(text(n, "companyName"))
                     .description(text(n, "description"))
@@ -93,8 +99,19 @@ public class AdminAiParseService {
                     .jobType(normalizeJobType(text(n, "jobType")))
                     .skillsRequired(text(n, "skillsRequired"))
                     .passoutYear(text(n, "passoutYear"))
+                    .qualificationMajor(text(n, "qualificationMajor"))
+                    .qualificationBranch(text(n, "qualificationBranch"))
+                    .qualificationYear(text(n, "qualificationYear"))
+                    .experienceText(text(n, "experienceText"))
+                    .audienceTag(normalizeAiAudienceTag(text(n, "audienceTag")))
                     .postedOn(text(n, "postedOn"))
                     .build();
+            String resolvedTag = JobAudienceTagResolver.resolve(
+                    parsed.getAudienceTag(),
+                    parsed.getExperienceText(),
+                    parsed.getPassoutYear(),
+                    parsed.getQualificationYear());
+            return parsed.toBuilder().audienceTag(resolvedTag).build();
         } catch (ValidationException e) {
             throw e;
         } catch (Exception e) {
@@ -207,6 +224,20 @@ public class AdminAiParseService {
         }
         String s = n.get(field).asText("").trim();
         return s.isEmpty() ? null : s;
+    }
+
+    private static String normalizeAiAudienceTag(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        String u = raw.trim().toUpperCase();
+        if (u.contains("FRESHER")) {
+            return JobAudienceTagResolver.FRESHERS;
+        }
+        if (u.contains("EXPERIENC")) {
+            return JobAudienceTagResolver.EXPERIENCED;
+        }
+        return JobAudienceTagResolver.normalizeExplicit(raw);
     }
 
     private static String normalizeJobType(String t) {

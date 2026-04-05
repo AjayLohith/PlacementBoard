@@ -1,7 +1,9 @@
 import { api } from './client.js';
 
-export async function fetchJobs() {
-  const { data } = await api.get('/api/jobs');
+export async function fetchJobs({ page = 0, size = 8, audience = 'ALL' } = {}) {
+  const { data } = await api.get('/api/jobs', {
+    params: { page, size, audience },
+  });
   return data;
 }
 

@@ -28,6 +28,17 @@ public class JobPostingRequest {
 
     private String passoutYear;
 
+    private String qualificationMajor;
+
+    private String qualificationBranch;
+
+    private String qualificationYear;
+
+    private String experienceText;
+
+    /** Optional override; normally derived from experience and cohort years. */
+    private String audienceTag;
+
     private String postedOn;
 
     private Boolean active;

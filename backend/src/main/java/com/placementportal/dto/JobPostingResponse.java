@@ -25,6 +25,13 @@ public class JobPostingResponse {
     private String jobType;
     private String skillsRequired;
     private String passoutYear;
+
+    private String qualificationMajor;
+    private String qualificationBranch;
+    private String qualificationYear;
+    private String experienceText;
+    private String audienceTag;
+
     private String postedOn;
     private Boolean active;
     private Instant createdAt;

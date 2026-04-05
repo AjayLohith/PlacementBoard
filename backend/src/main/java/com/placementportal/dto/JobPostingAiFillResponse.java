@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class JobPostingAiFillResponse {
 
     private String title;
@@ -22,6 +22,13 @@ public class JobPostingAiFillResponse {
     private String skillsRequired;
     /** Target graduation / passout years (e.g. "2025", "2025–2026"). */
     private String passoutYear;
+
+    private String qualificationMajor;
+    private String qualificationBranch;
+    private String qualificationYear;
+    private String experienceText;
+    private String audienceTag;
+
     /** Posted date or application deadline as short text (e.g. "Posted Jan 2026"). */
     private String postedOn;
 }

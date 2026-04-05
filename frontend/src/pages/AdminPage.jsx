@@ -158,6 +158,11 @@ export function AdminPage() {
     jobType: '',
     skillsRequired: '',
     passoutYear: '',
+    qualificationMajor: '',
+    qualificationBranch: '',
+    qualificationYear: '',
+    experienceText: '',
+    audienceTag: '',
     postedOn: '',
     active: true,
   });
@@ -187,6 +192,11 @@ export function AdminPage() {
         jobType: data.jobType ?? f.jobType,
         skillsRequired: data.skillsRequired ?? f.skillsRequired,
         passoutYear: data.passoutYear ?? f.passoutYear,
+        qualificationMajor: data.qualificationMajor ?? f.qualificationMajor,
+        qualificationBranch: data.qualificationBranch ?? f.qualificationBranch,
+        qualificationYear: data.qualificationYear ?? f.qualificationYear,
+        experienceText: data.experienceText ?? f.experienceText,
+        audienceTag: data.audienceTag ?? f.audienceTag,
         postedOn: data.postedOn ?? f.postedOn,
       }));
       toast.success('Job fields filled from AI — review and publish.');
@@ -278,6 +288,11 @@ export function AdminPage() {
         jobType: jobForm.jobType.trim() || undefined,
         skillsRequired: jobForm.skillsRequired.trim() || undefined,
         passoutYear: jobForm.passoutYear.trim() || undefined,
+        qualificationMajor: jobForm.qualificationMajor.trim() || undefined,
+        qualificationBranch: jobForm.qualificationBranch.trim() || undefined,
+        qualificationYear: jobForm.qualificationYear.trim() || undefined,
+        experienceText: jobForm.experienceText.trim() || undefined,
+        audienceTag: jobForm.audienceTag.trim() || undefined,
         postedOn: jobForm.postedOn.trim() || undefined,
         active: jobForm.active,
       };
@@ -300,6 +315,11 @@ export function AdminPage() {
         jobType: '',
         skillsRequired: '',
         passoutYear: '',
+        qualificationMajor: '',
+        qualificationBranch: '',
+        qualificationYear: '',
+        experienceText: '',
+        audienceTag: '',
         postedOn: '',
         active: true,
       });
@@ -448,7 +468,8 @@ export function AdminPage() {
               </h3>
               <p className="field__hint" style={{ marginBottom: '0.75rem' }}>
                 Paste a full job forward, JD, or link dump. One click fills title, company, description, apply link,
-                location, type, skills, passout year, and posted/deadline line. Uses the server-side{' '}
+                location, type, skills, passout year, qualification (major, branch, year), experience line, audience tag
+                (Freshers / Experienced), and posted/deadline line. Uses the server-side{' '}
                 <code>AI_API_KEY</code> only — it is never sent to the browser.
               </p>
               <textarea
@@ -562,6 +583,77 @@ export function AdminPage() {
                   />
                 </div>
               </div>
+              <p className="page-head__eyebrow" style={{ marginTop: '1rem', marginBottom: '0.5rem' }}>
+                Qualification &amp; experience
+              </p>
+              <div className="inline-fields inline-fields--2">
+                <div className="field">
+                  <label className="field__label" htmlFor="j-qmajor">
+                    Major / degree
+                  </label>
+                  <input
+                    id="j-qmajor"
+                    className="input"
+                    placeholder="e.g. B.Tech CSE"
+                    value={jobForm.qualificationMajor}
+                    onChange={(e) => setJobForm((f) => ({ ...f, qualificationMajor: e.target.value }))}
+                  />
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="j-qbranch">
+                    Branch
+                  </label>
+                  <input
+                    id="j-qbranch"
+                    className="input"
+                    placeholder="e.g. CSE, IT"
+                    value={jobForm.qualificationBranch}
+                    onChange={(e) => setJobForm((f) => ({ ...f, qualificationBranch: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className="inline-fields inline-fields--2">
+                <div className="field">
+                  <label className="field__label" htmlFor="j-qyear">
+                    Graduating year / batch
+                  </label>
+                  <input
+                    id="j-qyear"
+                    className="input"
+                    placeholder="e.g. 2025, 2024–2026"
+                    value={jobForm.qualificationYear}
+                    onChange={(e) => setJobForm((f) => ({ ...f, qualificationYear: e.target.value }))}
+                  />
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="j-exp">
+                    Experience
+                  </label>
+                  <input
+                    id="j-exp"
+                    className="input"
+                    placeholder="Fresher or e.g. 3 years Java"
+                    value={jobForm.experienceText}
+                    onChange={(e) => setJobForm((f) => ({ ...f, experienceText: e.target.value }))}
+                  />
+                </div>
+              </div>
+              <div className="field">
+                <label className="field__label" htmlFor="j-audience">
+                  Audience tag (optional)
+                </label>
+                <select
+                  id="j-audience"
+                  className="select"
+                  value={jobForm.audienceTag}
+                  onChange={(e) => setJobForm((f) => ({ ...f, audienceTag: e.target.value }))}
+                >
+                  <option value="">Auto (from experience &amp; years)</option>
+                  <option value="FRESHERS">Freshers</option>
+                  <option value="EXPERIENCED">Experienced</option>
+                </select>
+                <p className="field__hint">Leave on Auto unless you need to override the Freshers / Experienced filter.</p>
+              </div>
               <div className="field">
                 <label className="field__label" htmlFor="j-skills">
                   Skills required
@@ -619,6 +711,11 @@ export function AdminPage() {
                         jobType: '',
                         skillsRequired: '',
                         passoutYear: '',
+                        qualificationMajor: '',
+                        qualificationBranch: '',
+                        qualificationYear: '',
+                        experienceText: '',
+                        audienceTag: '',
                         postedOn: '',
                         active: true,
                       });
@@ -661,6 +758,11 @@ export function AdminPage() {
                         jobType: j.jobType || '',
                         skillsRequired: j.skillsRequired || '',
                         passoutYear: j.passoutYear || '',
+                        qualificationMajor: j.qualificationMajor || '',
+                        qualificationBranch: j.qualificationBranch || '',
+                        qualificationYear: j.qualificationYear || '',
+                        experienceText: j.experienceText || '',
+                        audienceTag: j.audienceTag || '',
                         postedOn: j.postedOn || '',
                         active: j.active !== false,
                       });

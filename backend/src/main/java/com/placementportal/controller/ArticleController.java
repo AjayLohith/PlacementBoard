@@ -3,6 +3,7 @@ package com.placementportal.controller;
 import com.placementportal.dto.ArticleDetailResponse;
 import com.placementportal.dto.ArticleRequest;
 import com.placementportal.dto.ArticleSummaryResponse;
+import com.placementportal.dto.PagedResponse;
 import com.placementportal.security.AdminAuthorizationService;
 import com.placementportal.service.ArticleService;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -33,8 +35,10 @@ public class ArticleController {
     private final AdminAuthorizationService adminAuthorizationService;
 
     @GetMapping
-    public ResponseEntity<List<ArticleSummaryResponse>> listPublished() {
-        return ResponseEntity.ok(articleService.listPublishedSummaries());
+    public ResponseEntity<PagedResponse<ArticleSummaryResponse>> listPublished(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size) {
+        return ResponseEntity.ok(articleService.listPublishedSummariesPaged(page, size));
     }
 
     @GetMapping("/slug/{slug}")

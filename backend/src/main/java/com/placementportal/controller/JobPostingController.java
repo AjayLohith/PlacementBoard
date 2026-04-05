@@ -2,6 +2,7 @@ package com.placementportal.controller;
 
 import com.placementportal.dto.JobPostingRequest;
 import com.placementportal.dto.JobPostingResponse;
+import com.placementportal.dto.PagedResponse;
 import com.placementportal.security.AdminAuthorizationService;
 import com.placementportal.service.JobPostingService;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -32,8 +34,11 @@ public class JobPostingController {
     private final AdminAuthorizationService adminAuthorizationService;
 
     @GetMapping
-    public ResponseEntity<List<JobPostingResponse>> listPublic() {
-        return ResponseEntity.ok(jobPostingService.listActive());
+    public ResponseEntity<PagedResponse<JobPostingResponse>> listPublic(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "ALL") String audience) {
+        return ResponseEntity.ok(jobPostingService.listActivePaged(page, size, audience));
     }
 
     @GetMapping("/admin")

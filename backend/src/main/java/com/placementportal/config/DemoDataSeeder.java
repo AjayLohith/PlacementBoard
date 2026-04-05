@@ -195,6 +195,12 @@ public class DemoDataSeeder implements ApplicationRunner {
                 .applyLink("https://example.com/apply")
                 .location("Remote / India")
                 .jobType("intern")
+                .qualificationMajor("B.Tech / B.E.")
+                .qualificationBranch("CSE")
+                .qualificationYear("2025")
+                .experienceText("Fresher")
+                .audienceTag("FRESHERS")
+                .passoutYear("2025")
                 .active(true)
                 .build());
         jobPostingRepository.save(JobPosting.builder()
@@ -203,6 +209,11 @@ public class DemoDataSeeder implements ApplicationRunner {
                 .description("Help peers document interview experiences and run resume clinics.")
                 .location("On-campus")
                 .jobType("part-time")
+                .qualificationMajor("Any")
+                .qualificationBranch("Open")
+                .qualificationYear("2024–2026")
+                .experienceText("Fresher")
+                .audienceTag("FRESHERS")
                 .active(true)
                 .build());
 

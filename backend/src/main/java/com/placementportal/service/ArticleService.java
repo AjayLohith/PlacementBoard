@@ -3,17 +3,20 @@ package com.placementportal.service;
 import com.placementportal.dto.ArticleDetailResponse;
 import com.placementportal.dto.ArticleRequest;
 import com.placementportal.dto.ArticleSummaryResponse;
+import com.placementportal.dto.PagedResponse;
 import com.placementportal.exception.ResourceNotFoundException;
 import com.placementportal.exception.ValidationException;
 import com.placementportal.model.Article;
 import com.placementportal.repository.ArticleRepository;
 import com.placementportal.util.SlugUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +24,18 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
 
-    public List<ArticleSummaryResponse> listPublishedSummaries() {
-        return articleRepository.findByPublishedTrueOrderByPublishedAtDesc().stream()
-                .map(this::toSummary)
-                .collect(Collectors.toList());
+    public PagedResponse<ArticleSummaryResponse> listPublishedSummariesPaged(int page, int size) {
+        int s = Math.min(Math.max(size, 1), 50);
+        int p = Math.max(page, 0);
+        var pageable = PageRequest.of(p, s, Sort.by(Sort.Direction.DESC, "publishedAt"));
+        Page<Article> result = articleRepository.findByPublishedTrueOrderByPublishedAtDesc(pageable);
+        return PagedResponse.<ArticleSummaryResponse>builder()
+                .content(result.getContent().stream().map(this::toSummary).collect(Collectors.toList()))
+                .totalElements(result.getTotalElements())
+                .totalPages(result.getTotalPages())
+                .page(result.getNumber())
+                .size(result.getSize())
+                .build();
     }
 
     public ArticleDetailResponse getPublishedBySlug(String slug) {

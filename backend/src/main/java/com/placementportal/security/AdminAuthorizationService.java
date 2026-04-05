@@ -21,8 +21,11 @@ public class AdminAuthorizationService {
         if (auth == null || !(auth.getPrincipal() instanceof UserPrincipal principal)) {
             throw new UnauthorizedException("Sign in required");
         }
+        String userEmail = principal.getEmail();
         boolean allowed = Arrays.stream(appProperties.getAdminEmails())
-                .anyMatch(e -> e.equalsIgnoreCase(principal.getEmail()));
+                .map(String::trim)
+                .filter(e -> !e.isEmpty())
+                .anyMatch(e -> e.equalsIgnoreCase(userEmail));
         if (!allowed) {
             throw new ForbiddenException("Not authorized as an admin");
         }

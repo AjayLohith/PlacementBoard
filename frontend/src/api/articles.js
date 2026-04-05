@@ -1,7 +1,9 @@
 import { api } from './client.js';
 
-export async function fetchArticles() {
-  const { data } = await api.get('/api/articles');
+export async function fetchArticles({ page = 0, size = 8 } = {}) {
+  const { data } = await api.get('/api/articles', {
+    params: { page, size },
+  });
   return data;
 }
 
