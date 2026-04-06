@@ -1,6 +1,6 @@
 <div align="left" style="position: relative;">
 
-  <h1>PlacementPedia</h1>
+  <h1>PlacementBoard</h1>
 
   <p align="left">
     A comprehensive placement and career development portal designed to connect students,
