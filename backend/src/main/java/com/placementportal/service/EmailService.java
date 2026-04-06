@@ -19,6 +19,9 @@ public class EmailService {
     @Value("${spring.mail.username:}")
     private String fromEmail;
 
+    @Value("${app.email.from-address:ajjgamerr@gmail.com}")
+    private String senderEmail;
+
     @Value("${spring.mail.password:}")
     private String mailPassword;
 
@@ -33,8 +36,8 @@ public class EmailService {
         }
         try {
             SimpleMailMessage mail = new SimpleMailMessage();
-            // Gmail requires From to match the authenticated account
-            mail.setFrom(user);
+            // Use verified sender address instead of the authentication username if it's a provider like Brevo
+            mail.setFrom(senderEmail);
             mail.setTo(toEmail);
             mail.setSubject(subject);
             mail.setText(text);

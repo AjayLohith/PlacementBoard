@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchArticles } from '../api/articles.js';
 
@@ -8,15 +8,10 @@ const PAGE_SIZE = 8;
 
 export function ArticlesPage() {
     const [page, setPage] = useState(0);
-    const [audience, setAudience] = useState('ALL');
-
-    useEffect(() => {
-        setPage(0);
-    }, [audience]);
 
     const { data, isLoading, isError } = useQuery({
-        queryKey: ['articles', page, audience],
-        queryFn: () => fetchArticles({ page, size: PAGE_SIZE, audience }),
+        queryKey: ['articles', page],
+        queryFn: () => fetchArticles({ page, size: PAGE_SIZE }),
     });
 
     const articles = data?.content ?? [];
@@ -30,30 +25,6 @@ export function ArticlesPage() {
                 <h1 className="page-head__title">Articles</h1>
                 <p className="page-head__lede">Tips and updates from the team.</p>
             </header>
-
-            <div className="filter-tabs">
-                <button
-                    type="button"
-                    className={`tabs__btn ${audience === 'ALL' ? 'tabs__btn--active' : ''}`}
-                    onClick={() => setAudience('ALL')}
-                >
-                    All
-                </button>
-                <button
-                    type="button"
-                    className={`tabs__btn ${audience === 'FRESHERS' ? 'tabs__btn--active' : ''}`}
-                    onClick={() => setAudience('FRESHERS')}
-                >
-                    Freshers
-                </button>
-                <button
-                    type="button"
-                    className={`tabs__btn ${audience === 'EXPERIENCED' ? 'tabs__btn--active' : ''}`}
-                    onClick={() => setAudience('EXPERIENCED')}
-                >
-                    Experienced
-                </button>
-            </div>
 
             {isLoading && (
                 <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>

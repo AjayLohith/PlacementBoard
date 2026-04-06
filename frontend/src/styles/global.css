@@ -431,6 +431,17 @@ a.btn {
   gap: 1.35rem;
 }
 
+.card-grid {
+  display: grid;
+  gap: 1.35rem;
+}
+
+@media (min-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 .company-card__link {
   display: block;
   text-decoration: none;
@@ -622,4 +633,18 @@ a.btn {
   .inline-fields--2 {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-bottom: 2rem;
+}
+
+.pager__meta {
+  font-size: 0.95rem;
+  color: var(--muted);
 }

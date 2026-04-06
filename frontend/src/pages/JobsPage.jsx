@@ -29,7 +29,7 @@ export function JobsPage() {
         <p className="page-head__lede">Postings from admins. Use apply links where provided.</p>
       </header>
 
-      <div className="filter-tabs">
+      <div className="tabs">
         <button
           type="button"
           className={`tabs__btn ${audience === 'ALL' ? 'tabs__btn--active' : ''}`}
