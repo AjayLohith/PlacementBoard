@@ -57,8 +57,8 @@ public class EmailService {
 
                 It expires in 10 minutes. If you did not request a reset, you can ignore this message.
 
-                — PlacementPedia
+                — PlacementBoard
                 """.formatted(otpCode);
-        sendEmail(toEmail, "Your PlacementPedia reset code", body.trim());
+        sendEmail(toEmail, "Your PlacementBoard reset code", body.trim());
     }
 }
