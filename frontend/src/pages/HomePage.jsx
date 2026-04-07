@@ -35,15 +35,6 @@ export function HomePage() {
             </Link>
           ) : null}
         </div>
-        <p className="field__hint" style={{ marginTop: '1.25rem' }}>
-          <Link to="/jobs" className="header__link">
-            Job board
-          </Link>
-          <span style={{ margin: '0 0.5rem', color: 'var(--border-strong)' }}>|</span>
-          <Link to="/articles" className="header__link">
-            Articles
-          </Link>
-        </p>
       </section>
 
       <section>
