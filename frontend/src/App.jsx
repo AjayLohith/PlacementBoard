@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { SessionSync } from './components/SessionSync.jsx';
 import { Shell } from './components/layout/Shell.jsx';
@@ -13,9 +14,30 @@ import { JobsPage } from './pages/JobsPage.jsx';
 import { LoginPage } from './pages/LoginPage.jsx';
 import { NotFoundPage } from './pages/NotFoundPage.jsx';
 import { RegisterPage } from './pages/RegisterPage.jsx';
+import { ServiceDownPage } from './pages/ServiceDownPage.jsx';
 import { SubmitExperiencePage } from './pages/SubmitExperiencePage.jsx';
 
 export default function App() {
+  const [apiDown, setApiDown] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+    const handleDown = () => setApiDown(true);
+    const handleUp = () => setApiDown(false);
+    window.addEventListener('pp:api-down', handleDown);
+    window.addEventListener('pp:api-up', handleUp);
+    return () => {
+      window.removeEventListener('pp:api-down', handleDown);
+      window.removeEventListener('pp:api-up', handleUp);
+    };
+  }, []);
+
+  if (apiDown) {
+    return <ServiceDownPage />;
+  }
+
   return (
     <>
       <SessionSync />

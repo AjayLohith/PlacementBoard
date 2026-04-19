@@ -671,3 +671,45 @@ a.btn {
   font-size: 0.95rem;
   color: var(--muted);
 }
+
+.service-down {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+}
+
+.service-down__card {
+  max-width: 520px;
+  width: 100%;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+}
+
+.service-down__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+  color: var(--accent-muted);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.service-down__title {
+  margin: 0 0 0.75rem;
+}
+
+.service-down__text {
+  color: var(--muted);
+  margin: 0 0 1.5rem;
+}
+
+.service-down__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}

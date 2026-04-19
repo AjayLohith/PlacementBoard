@@ -16,6 +16,23 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+function emitApiDown(err) {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  const detail = {
+    message: err?.message || 'Network error',
+  };
+  window.dispatchEvent(new CustomEvent('pp:api-down', { detail }));
+}
+
+function emitApiUp() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.dispatchEvent(new CustomEvent('pp:api-up'));
+}
+
 const TOKEN_KEY = 'pp_token';
 const USER_KEY = 'pp_user';
 
@@ -40,8 +57,17 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    emitApiUp();
+    return res;
+  },
   (err) => {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status;
+      if (!err.response || status === 502 || status === 503 || status === 504) {
+        emitApiDown(err);
+      }
+    }
     if (!axios.isAxiosError(err) || err.response?.status !== 401) {
       return Promise.reject(err);
     }
