@@ -29,4 +29,9 @@ public class HealthController {
         mongoTemplate.getDb().runCommand(new Document("ping", 1));
         return ResponseEntity.ok(Map.of("status", "UP", "mongo", "UP"));
     }
+
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("OK");
+    }
 }
