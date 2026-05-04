@@ -150,6 +150,7 @@ export function AdminPage() {
   const [expTab, setExpTab] = useState('pending');
   const [busyId, setBusyId] = useState(null);
   const [noteForm, setNoteForm] = useState({ title: '', content: '' });
+  const [expandedNoteId, setExpandedNoteId] = useState(null);
 
   const [jobForm, setJobForm] = useState({
     title: '',
@@ -244,6 +245,33 @@ export function AdminPage() {
     },
     onError: (e) => toast.error(getApiErrorMessage(e)),
   });
+
+  function safeFormatDate(value) {
+    try {
+      if (!value) return null;
+      // handle numeric timestamps (ms or seconds)
+      if (typeof value === 'number') return format(new Date(value), 'MMM d, yyyy');
+      if (/^\d+$/.test(String(value))) {
+        const n = Number(String(value));
+        // treat < 1e12 as seconds
+        const ms = n < 1e12 ? n * 1000 : n;
+        return format(new Date(ms), 'MMM d, yyyy');
+      }
+      return format(parseISO(value), 'MMM d, yyyy');
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function notePreview(content, max = 180) {
+    const text = String(content ?? '').trim();
+    if (text.length <= max) return text;
+    return `${text.slice(0, max).trimEnd()}...`;
+  }
+
+  const notes = Array.isArray(adminNotesQ.data)
+    ? adminNotesQ.data.filter((n) => n && typeof n === 'object')
+    : [];
 
   const pendingQ = useQuery({
     queryKey: ['admin', 'pending'],
@@ -1047,35 +1075,59 @@ export function AdminPage() {
                 <span className="spinner" />
               </div>
             )}
-            {!adminNotesQ.isLoading && adminNotesQ.data?.length === 0 && (
+            {adminNotesQ.isError && (
+              <div className="empty">Unable to load notes: {getApiErrorMessage(adminNotesQ.error)}</div>
+            )}
+            {!adminNotesQ.isLoading && !adminNotesQ.isError && notes.length === 0 && (
               <div className="empty">No admin notes yet.</div>
             )}
-            {!adminNotesQ.isLoading && adminNotesQ.data?.map((note) => (
-              <article key={note.id} className="card" style={{ marginBottom: '1rem' }}>
-                <div className="card__body">
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
-                    <strong>{note.title || 'Admin note'}</strong>
-                    {note.createdAt ? (
-                      <span className="badge badge--accent">
-                        {format(parseISO(note.createdAt), 'MMM d, yyyy')}
-                      </span>
-                    ) : null}
-                  </div>
-                  <p style={{ marginTop: '0.75rem', whiteSpace: 'pre-wrap' }}>{note.content}</p>
-                  <div className="form-actions" style={{ marginTop: '0.75rem' }}>
+            {!adminNotesQ.isLoading && !adminNotesQ.isError && notes.map((note) => {
+              const noteId = note.id ?? note._id;
+              const isExpanded = expandedNoteId != null && expandedNoteId === noteId;
+              const content = String(note.content ?? '');
+              const contentToShow = isExpanded ? content : notePreview(content);
+              const canExpand = content.length > notePreview(content).length;
+              return (
+                <article key={noteId} className="card" style={{ marginBottom: '1rem' }}>
+                  <div className="card__body">
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+                      <strong>{note.title || 'Admin note'}</strong>
+                      {note.createdAt ? (
+                        <span className="badge badge--accent">{safeFormatDate(note.createdAt)}</span>
+                      ) : null}
+                    </div>
                     <button
                       type="button"
-                      className="btn btn--danger btn--sm"
-                      onClick={() => {
-                        if (window.confirm('Delete this note?')) deleteAdminNotesM.mutate(note.id);
-                      }}
+                      className="btn btn--ghost btn--sm"
+                      style={{ marginTop: '0.75rem', textAlign: 'left', width: '100%', justifyContent: 'flex-start' }}
+                      onClick={() => setExpandedNoteId(isExpanded ? null : noteId)}
                     >
-                      Delete
+                      <span style={{ whiteSpace: 'pre-wrap' }}>{contentToShow}</span>
                     </button>
+                    <div className="form-actions" style={{ marginTop: '0.75rem' }}>
+                      {canExpand ? (
+                        <button
+                          type="button"
+                          className="btn btn--secondary btn--sm"
+                          onClick={() => setExpandedNoteId(isExpanded ? null : noteId)}
+                        >
+                          {isExpanded ? 'Show less' : 'Read full note'}
+                        </button>
+                      ) : null}
+                      <button
+                        type="button"
+                        className="btn btn--danger btn--sm"
+                        onClick={() => {
+                          if (window.confirm('Delete this note?')) deleteAdminNotesM.mutate(note.id ?? note._id);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
         </div>
       )}
