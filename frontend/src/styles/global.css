@@ -705,6 +705,61 @@ a.btn {
   min-height: 2.35rem;
 }
 
+.note-card__previewContent {
+  margin-top: 0.7rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-card__markdownContent {
+  margin-top: 0.7rem;
+  color: var(--ink);
+  display: block;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.note-card__markdownContent p,
+.note-card__markdownContent ul,
+.note-card__markdownContent ol,
+.note-card__markdownContent blockquote {
+  margin-top: 0;
+}
+
+.note-card__markdownContent > *:last-child {
+  margin-bottom: 0.75rem; /* ensure actions sit below content */
+}
+
+.note-card__markdownContent > :last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure note cards stay opaque and stack naturally */
+.note-card {
+  background: var(--surface);
+}
+
+.note-card--expanded {
+  position: static;
+  z-index: auto;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 480px) {
+  .note-card__previewContent,
+  .note-card__markdownContent {
+    margin-top: 0.6rem;
+  }
+
+  .note-card__previewContent {
+    -webkit-line-clamp: 5;
+  }
+}
+
 @media (max-width: 480px) {
   .note-card .card__body {
     padding: 1rem 1rem 1.05rem;

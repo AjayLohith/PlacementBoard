@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import { toast } from 'sonner';
 import remarkGfm from 'remark-gfm';
 import {
@@ -1137,7 +1138,7 @@ export function AdminPage() {
                     ref={noteContentRef}
                     className="textarea markdown-editor"
                     rows={8}
-                    placeholder="# Heading\n\nWrite notes in GitHub-style Markdown. Use **bold**, *italic*, lists, quotes, and code blocks."
+                    placeholder="# Write notes in Markdown."
                     value={noteForm.content}
                     onChange={(e) => setNoteForm((f) => ({ ...f, content: e.target.value }))}
                   />
@@ -1175,10 +1176,14 @@ export function AdminPage() {
               const isExpanded = expandedNoteId != null && expandedNoteId === noteId;
               const content = String(note.content ?? '');
               const plainPreview = stripMarkdown(content);
-              const contentToShow = isExpanded ? plainPreview : notePreview(plainPreview);
-              const canExpand = plainPreview.length > notePreview(plainPreview).length;
+              const previewText = notePreview(plainPreview);
+              const canExpand = plainPreview.length > previewText.length;
               return (
-                <article key={noteId} className="card note-card" style={{ marginBottom: '1rem' }}>
+                <article
+                  key={noteId}
+                  className={`card note-card ${isExpanded ? 'note-card--expanded' : ''}`}
+                  style={{ marginBottom: '1rem' }}
+                >
                   <div className="card__body">
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
                       <strong>{note.title || 'Admin note'}</strong>
@@ -1186,21 +1191,21 @@ export function AdminPage() {
                         <span className="badge badge--accent">{safeFormatDate(note.createdAt)}</span>
                       ) : null}
                     </div>
+
                     {!isExpanded ? (
-                      <button
-                        type="button"
-                        className="note-card__preview"
-                        onClick={() => setExpandedNoteId(noteId)}
-                        aria-expanded={false}
-                      >
-                        <span>{contentToShow}</span>
-                      </button>
-                    ) : null}
-                    {isExpanded ? (
-                      <div className="note-card__markdown">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                      <div className="note-card__previewContent">
+                        <span className="note-card__preview">{previewText}</span>
                       </div>
                     ) : null}
+
+                    {isExpanded ? (
+                      <div className="note-card__markdownContent">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                          {content}
+                        </ReactMarkdown>
+                      </div>
+                    ) : null}
+
                     <div className="form-actions note-card__actions">
                       {canExpand ? (
                         <button
@@ -1208,7 +1213,7 @@ export function AdminPage() {
                           className="btn btn--secondary btn--sm"
                           onClick={() => setExpandedNoteId(isExpanded ? null : noteId)}
                         >
-                          {isExpanded ? 'Show less' : 'Read full note'}
+                          {isExpanded ? 'Close' : 'Open'}
                         </button>
                       ) : null}
                       <button
