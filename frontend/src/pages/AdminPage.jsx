@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import {
   createArticle,
@@ -18,6 +18,7 @@ import {
   rejectExperience,
 } from '../api/experiences.js';
 import { createJob, deleteJob, fetchJobsAdmin, updateJob } from '../api/jobs.js';
+import { getAdminNotes, updateAdminNotes } from '../api/adminNotes.js';
 
 function ExperienceAdminRow({ exp, busy, onApprove, onReject, onDelete }) {
   let dateLabel = exp.interviewDate;
@@ -148,6 +149,7 @@ export function AdminPage() {
   const [section, setSection] = useState('experiences');
   const [expTab, setExpTab] = useState('pending');
   const [busyId, setBusyId] = useState(null);
+  const [adminNotesContent, setAdminNotesContent] = useState('');
 
   const [jobForm, setJobForm] = useState({
     title: '',
@@ -178,6 +180,26 @@ export function AdminPage() {
   });
   const [editingArticleId, setEditingArticleId] = useState(null);
   const [articleAiPaste, setArticleAiPaste] = useState('');
+
+  const adminNotesQ = useQuery({
+    queryKey: ['admin', 'notes'],
+    queryFn: getAdminNotes,
+  });
+
+  const saveAdminNotesM = useMutation({
+    mutationFn: (content) => updateAdminNotes(content),
+    onSuccess: () => {
+      toast.success('Notes saved');
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notes'] });
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e)),
+  });
+
+  useEffect(() => {
+    if (adminNotesQ.data?.content) {
+      setAdminNotesContent(adminNotesQ.data.content);
+    }
+  }, [adminNotesQ.data]);
 
   const parseJobAiM = useMutation({
     mutationFn: () => aiParseJob(jobAiPaste),
@@ -403,6 +425,13 @@ export function AdminPage() {
           onClick={() => setSection('articles')}
         >
           Articles
+        </button>
+        <button
+          type="button"
+          className={`tabs__btn ${section === 'notes' ? 'tabs__btn--active' : ''}`}
+          onClick={() => setSection('notes')}
+        >
+          Admin notes
         </button>
       </div>
 
@@ -958,6 +987,51 @@ export function AdminPage() {
             </article>
           ))}
         </>
+      )}
+
+      {section === 'notes' && (
+        <div className="card">
+          <div className="card__body">
+            <h3 className="page-head__title" style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+              Admin notes
+            </h3>
+            <p className="field__hint" style={{ marginBottom: '0.75rem' }}>
+              Private notes for admins only. These notes are saved on the website and visible to all admins.
+            </p>
+            {adminNotesQ.isLoading && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                <span className="spinner" />
+              </div>
+            )}
+            {!adminNotesQ.isLoading && (
+              <>
+                <div className="field">
+                  <label className="field__label" htmlFor="admin-notes">
+                    Notes
+                  </label>
+                  <textarea
+                    id="admin-notes"
+                    className="textarea"
+                    rows={10}
+                    placeholder="Paste admin notes here…"
+                    value={adminNotesContent}
+                    onChange={(e) => setAdminNotesContent(e.target.value)}
+                  />
+                </div>
+                <div className="form-actions" style={{ marginTop: '1rem' }}>
+                  <button
+                    type="button"
+                    className="btn btn--primary"
+                    disabled={saveAdminNotesM.isPending}
+                    onClick={() => saveAdminNotesM.mutate(adminNotesContent)}
+                  >
+                    {saveAdminNotesM.isPending ? <span className="spinner" /> : 'Save notes'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </>
   );

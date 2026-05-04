@@ -3,10 +3,10 @@ import axios from 'axios';
 function resolveBaseUrl() {
   const fromEnv = import.meta.env.VITE_API_URL?.trim();
   if (fromEnv) {
+    if (import.meta.env.DEV && /^https?:\/\/(127\.0\.0\.1|localhost):5001\/?$/i.test(fromEnv)) {
+      return '';
+    }
     return fromEnv.replace(/\/$/, '');
-  }
-  if (import.meta.env.DEV) {
-    return 'http://127.0.0.1:5001';
   }
   return '';
 }
