@@ -6,6 +6,7 @@ import com.placementportal.security.AdminAuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,8 @@ public class AdminNotesController {
     @GetMapping
     public ResponseEntity<List<AdminNotes>> getNotes() {
         adminAuthorizationService.requireAdmin();
-        return ResponseEntity.ok(adminNotesRepository.findAllByOrderByCreatedAtDesc());
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        return ResponseEntity.ok(adminNotesRepository.findAll(sort));
     }
 
     @PostMapping
