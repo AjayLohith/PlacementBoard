@@ -399,6 +399,29 @@ a.btn {
   line-height: 1.5;
 }
 
+.markdown-editor {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.96rem;
+  min-height: 220px;
+}
+
+.md-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.65rem;
+}
+
+.md-toolbar .btn {
+  padding-inline: 0.62rem;
+}
+
+@media (max-width: 480px) {
+  .markdown-editor {
+    min-height: 260px;
+  }
+}
+
 .field__error {
   font-size: 0.82rem;
   color: var(--danger);
@@ -606,6 +629,96 @@ a.btn {
   flex-wrap: wrap;
   gap: 0.65rem;
   margin-top: 1.25rem;
+}
+
+.note-card__preview {
+  display: block;
+  width: 100%;
+  margin-top: 0.85rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  cursor: pointer;
+}
+
+.note-card__preview:hover {
+  color: var(--accent);
+}
+
+.note-card__markdown {
+  margin-top: 0.85rem;
+  color: var(--ink);
+}
+
+.note-card__markdown :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0.7rem 0 0.45rem;
+}
+
+.note-card__markdown h1 {
+  font-size: 1.35rem;
+}
+
+.note-card__markdown h2 {
+  font-size: 1.15rem;
+}
+
+.note-card__markdown p,
+.note-card__markdown ul,
+.note-card__markdown ol,
+.note-card__markdown blockquote,
+.note-card__markdown pre {
+  margin: 0 0 0.85rem;
+}
+
+.note-card__markdown ul,
+.note-card__markdown ol {
+  padding-left: 1.25rem;
+}
+
+.note-card__markdown blockquote {
+  border-left: 3px solid var(--border-strong);
+  padding-left: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.note-card__markdown pre {
+  overflow: auto;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.note-card__markdown code {
+  white-space: pre-wrap;
+}
+
+.note-card__actions {
+  margin-top: 0.95rem;
+}
+
+.note-card__actions .btn {
+  min-height: 2.35rem;
+}
+
+@media (max-width: 480px) {
+  .note-card .card__body {
+    padding: 1rem 1rem 1.05rem;
+  }
+
+  .note-card__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .note-card__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .hero {

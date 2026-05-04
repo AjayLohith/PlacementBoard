@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { toast } from 'sonner';
+import remarkGfm from 'remark-gfm';
 import {
   createArticle,
   deleteArticle,
@@ -151,6 +153,7 @@ export function AdminPage() {
   const [busyId, setBusyId] = useState(null);
   const [noteForm, setNoteForm] = useState({ title: '', content: '' });
   const [expandedNoteId, setExpandedNoteId] = useState(null);
+  const noteContentRef = useRef(null);
 
   const [jobForm, setJobForm] = useState({
     title: '',
@@ -267,6 +270,63 @@ export function AdminPage() {
     const text = String(content ?? '').trim();
     if (text.length <= max) return text;
     return `${text.slice(0, max).trimEnd()}...`;
+  }
+
+  function stripMarkdown(content) {
+    return String(content ?? '')
+      .replace(/^#{1,6}\s+/gm, '')
+      .replace(/\*\*(.*?)\*\*/g, '$1')
+      .replace(/\*(.*?)\*/g, '$1')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/^>\s?/gm, '')
+      .replace(/^[-*+]\s+/gm, '• ')
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+      .trim();
+  }
+
+  function applyMarkdownLinePrefix(prefix) {
+    const el = noteContentRef.current;
+    if (!el) return;
+
+    const value = noteForm.content;
+    const start = el.selectionStart ?? value.length;
+    const end = el.selectionEnd ?? value.length;
+    const lineStart = value.lastIndexOf('\n', Math.max(0, start - 1)) + 1;
+    const lineEnd = value.indexOf('\n', end);
+    const resolvedLineEnd = lineEnd === -1 ? value.length : lineEnd;
+    const selected = value.slice(lineStart, resolvedLineEnd);
+    const transformed = selected
+      .split('\n')
+      .map((line) => (line.length ? `${prefix}${line}` : prefix.trimEnd()))
+      .join('\n');
+
+    const nextValue = `${value.slice(0, lineStart)}${transformed}${value.slice(resolvedLineEnd)}`;
+    setNoteForm((f) => ({ ...f, content: nextValue }));
+
+    window.requestAnimationFrame(() => {
+      const nextCursor = lineStart + transformed.length;
+      el.focus();
+      el.setSelectionRange(nextCursor, nextCursor);
+    });
+  }
+
+  function wrapMarkdownSelection(before, after = before) {
+    const el = noteContentRef.current;
+    if (!el) return;
+
+    const value = noteForm.content;
+    const start = el.selectionStart ?? value.length;
+    const end = el.selectionEnd ?? value.length;
+    const selected = value.slice(start, end) || 'text';
+    const nextValue = `${value.slice(0, start)}${before}${selected}${after}${value.slice(end)}`;
+    setNoteForm((f) => ({ ...f, content: nextValue }));
+
+    window.requestAnimationFrame(() => {
+      const nextStart = start + before.length;
+      const nextEnd = nextStart + selected.length;
+      el.focus();
+      el.setSelectionRange(nextStart, nextEnd);
+    });
   }
 
   const notes = Array.isArray(adminNotesQ.data)
@@ -1028,7 +1088,8 @@ export function AdminPage() {
               Admin notes
             </h3>
             <p className="field__hint" style={{ marginBottom: '0.75rem' }}>
-              Private notes for admins only. Add a note and it will appear here as its own entry.
+              Private notes for admins only. Markdown is supported, including headings, bold, italic, lists, quotes,
+              and code blocks.
             </p>
             <div className="card" style={{ marginBottom: '1.5rem', background: 'var(--surface)' }}>
               <div className="card__body">
@@ -1048,14 +1109,42 @@ export function AdminPage() {
                   <label className="field__label" htmlFor="admin-note-content">
                     Note
                   </label>
+                  <div className="md-toolbar" role="toolbar" aria-label="Markdown formatting tools">
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => applyMarkdownLinePrefix('# ')}>
+                      H1
+                    </button>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => applyMarkdownLinePrefix('## ')}>
+                      H2
+                    </button>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => wrapMarkdownSelection('**')}>
+                      Bold
+                    </button>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => wrapMarkdownSelection('*')}>
+                      Italic
+                    </button>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => applyMarkdownLinePrefix('- ')}>
+                      List
+                    </button>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => applyMarkdownLinePrefix('> ')}>
+                      Quote
+                    </button>
+                    <button type="button" className="btn btn--ghost btn--sm" onClick={() => wrapMarkdownSelection('`')}>
+                      Code
+                    </button>
+                  </div>
                   <textarea
                     id="admin-note-content"
-                    className="textarea"
+                    ref={noteContentRef}
+                    className="textarea markdown-editor"
                     rows={8}
-                    placeholder="Paste admin note here…"
+                    placeholder="# Heading\n\nWrite notes in GitHub-style Markdown. Use **bold**, *italic*, lists, quotes, and code blocks."
                     value={noteForm.content}
                     onChange={(e) => setNoteForm((f) => ({ ...f, content: e.target.value }))}
                   />
+                  <p className="field__hint">
+                    Tip: use <code># Heading</code>, <code>**bold**</code>, <code>*italic*</code>, <code>- list</code>, and{' '}
+                    <code>{'```'}</code> blocks.
+                  </p>
                 </div>
                 <div className="form-actions" style={{ marginTop: '1rem' }}>
                   <button
@@ -1085,10 +1174,11 @@ export function AdminPage() {
               const noteId = note.id ?? note._id;
               const isExpanded = expandedNoteId != null && expandedNoteId === noteId;
               const content = String(note.content ?? '');
-              const contentToShow = isExpanded ? content : notePreview(content);
-              const canExpand = content.length > notePreview(content).length;
+              const plainPreview = stripMarkdown(content);
+              const contentToShow = isExpanded ? plainPreview : notePreview(plainPreview);
+              const canExpand = plainPreview.length > notePreview(plainPreview).length;
               return (
-                <article key={noteId} className="card" style={{ marginBottom: '1rem' }}>
+                <article key={noteId} className="card note-card" style={{ marginBottom: '1rem' }}>
                   <div className="card__body">
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
                       <strong>{note.title || 'Admin note'}</strong>
@@ -1096,15 +1186,22 @@ export function AdminPage() {
                         <span className="badge badge--accent">{safeFormatDate(note.createdAt)}</span>
                       ) : null}
                     </div>
-                    <button
-                      type="button"
-                      className="btn btn--ghost btn--sm"
-                      style={{ marginTop: '0.75rem', textAlign: 'left', width: '100%', justifyContent: 'flex-start' }}
-                      onClick={() => setExpandedNoteId(isExpanded ? null : noteId)}
-                    >
-                      <span style={{ whiteSpace: 'pre-wrap' }}>{contentToShow}</span>
-                    </button>
-                    <div className="form-actions" style={{ marginTop: '0.75rem' }}>
+                    {!isExpanded ? (
+                      <button
+                        type="button"
+                        className="note-card__preview"
+                        onClick={() => setExpandedNoteId(noteId)}
+                        aria-expanded={false}
+                      >
+                        <span>{contentToShow}</span>
+                      </button>
+                    ) : null}
+                    {isExpanded ? (
+                      <div className="note-card__markdown">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+                      </div>
+                    ) : null}
+                    <div className="form-actions note-card__actions">
                       {canExpand ? (
                         <button
                           type="button"
