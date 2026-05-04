@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import {
   createArticle,
@@ -18,7 +18,7 @@ import {
   rejectExperience,
 } from '../api/experiences.js';
 import { createJob, deleteJob, fetchJobsAdmin, updateJob } from '../api/jobs.js';
-import { getAdminNotes, updateAdminNotes } from '../api/adminNotes.js';
+import { createAdminNote, deleteAdminNote, fetchAdminNotes } from '../api/adminNotes.js';
 
 function ExperienceAdminRow({ exp, busy, onApprove, onReject, onDelete }) {
   let dateLabel = exp.interviewDate;
@@ -149,7 +149,7 @@ export function AdminPage() {
   const [section, setSection] = useState('experiences');
   const [expTab, setExpTab] = useState('pending');
   const [busyId, setBusyId] = useState(null);
-  const [adminNotesContent, setAdminNotesContent] = useState('');
+  const [noteForm, setNoteForm] = useState({ title: '', content: '' });
 
   const [jobForm, setJobForm] = useState({
     title: '',
@@ -183,23 +183,27 @@ export function AdminPage() {
 
   const adminNotesQ = useQuery({
     queryKey: ['admin', 'notes'],
-    queryFn: getAdminNotes,
+    queryFn: fetchAdminNotes,
   });
 
-  const saveAdminNotesM = useMutation({
-    mutationFn: (content) => updateAdminNotes(content),
+  const createAdminNotesM = useMutation({
+    mutationFn: () => createAdminNote(noteForm),
     onSuccess: () => {
-      toast.success('Notes saved');
+      toast.success('Note saved');
       queryClient.invalidateQueries({ queryKey: ['admin', 'notes'] });
+      setNoteForm({ title: '', content: '' });
     },
     onError: (e) => toast.error(getApiErrorMessage(e)),
   });
 
-  useEffect(() => {
-    if (adminNotesQ.data?.content) {
-      setAdminNotesContent(adminNotesQ.data.content);
-    }
-  }, [adminNotesQ.data]);
+  const deleteAdminNotesM = useMutation({
+    mutationFn: deleteAdminNote,
+    onSuccess: () => {
+      toast.success('Note removed');
+      queryClient.invalidateQueries({ queryKey: ['admin', 'notes'] });
+    },
+    onError: (e) => toast.error(getApiErrorMessage(e)),
+  });
 
   const parseJobAiM = useMutation({
     mutationFn: () => aiParseJob(jobAiPaste),
@@ -996,40 +1000,82 @@ export function AdminPage() {
               Admin notes
             </h3>
             <p className="field__hint" style={{ marginBottom: '0.75rem' }}>
-              Private notes for admins only. These notes are saved on the website and visible to all admins.
+              Private notes for admins only. Add a note and it will appear here as its own entry.
             </p>
-            {adminNotesQ.isLoading && (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
-                <span className="spinner" />
-              </div>
-            )}
-            {!adminNotesQ.isLoading && (
-              <>
+            <div className="card" style={{ marginBottom: '1.5rem', background: 'var(--surface)' }}>
+              <div className="card__body">
                 <div className="field">
-                  <label className="field__label" htmlFor="admin-notes">
-                    Notes
+                  <label className="field__label" htmlFor="admin-note-title">
+                    Title
+                  </label>
+                  <input
+                    id="admin-note-title"
+                    className="input"
+                    placeholder="Optional title"
+                    value={noteForm.title}
+                    onChange={(e) => setNoteForm((f) => ({ ...f, title: e.target.value }))}
+                  />
+                </div>
+                <div className="field">
+                  <label className="field__label" htmlFor="admin-note-content">
+                    Note
                   </label>
                   <textarea
-                    id="admin-notes"
+                    id="admin-note-content"
                     className="textarea"
-                    rows={10}
-                    placeholder="Paste admin notes here…"
-                    value={adminNotesContent}
-                    onChange={(e) => setAdminNotesContent(e.target.value)}
+                    rows={8}
+                    placeholder="Paste admin note here…"
+                    value={noteForm.content}
+                    onChange={(e) => setNoteForm((f) => ({ ...f, content: e.target.value }))}
                   />
                 </div>
                 <div className="form-actions" style={{ marginTop: '1rem' }}>
                   <button
                     type="button"
                     className="btn btn--primary"
-                    disabled={saveAdminNotesM.isPending}
-                    onClick={() => saveAdminNotesM.mutate(adminNotesContent)}
+                    disabled={!noteForm.content.trim() || createAdminNotesM.isPending}
+                    onClick={() => createAdminNotesM.mutate()}
                   >
-                    {saveAdminNotesM.isPending ? <span className="spinner" /> : 'Save notes'}
+                    {createAdminNotesM.isPending ? <span className="spinner" /> : 'Save note'}
                   </button>
                 </div>
-              </>
+              </div>
+            </div>
+
+            {adminNotesQ.isLoading && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                <span className="spinner" />
+              </div>
             )}
+            {!adminNotesQ.isLoading && adminNotesQ.data?.length === 0 && (
+              <div className="empty">No admin notes yet.</div>
+            )}
+            {!adminNotesQ.isLoading && adminNotesQ.data?.map((note) => (
+              <article key={note.id} className="card" style={{ marginBottom: '1rem' }}>
+                <div className="card__body">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center' }}>
+                    <strong>{note.title || 'Admin note'}</strong>
+                    {note.createdAt ? (
+                      <span className="badge badge--accent">
+                        {format(parseISO(note.createdAt), 'MMM d, yyyy')}
+                      </span>
+                    ) : null}
+                  </div>
+                  <p style={{ marginTop: '0.75rem', whiteSpace: 'pre-wrap' }}>{note.content}</p>
+                  <div className="form-actions" style={{ marginTop: '0.75rem' }}>
+                    <button
+                      type="button"
+                      className="btn btn--danger btn--sm"
+                      onClick={() => {
+                        if (window.confirm('Delete this note?')) deleteAdminNotesM.mutate(note.id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       )}
