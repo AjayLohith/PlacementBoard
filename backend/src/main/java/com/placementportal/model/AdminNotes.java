@@ -1,5 +1,6 @@
 package com.placementportal.model;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 
-@Document(collection = "admin_notes")
+@Document(collection = "admin_notes_v2")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +23,9 @@ public class AdminNotes {
     @Id
     private String id;
 
+    private String title;
+
+    @NotBlank(message = "Content is required")
     private String content;
 
     @CreatedDate
