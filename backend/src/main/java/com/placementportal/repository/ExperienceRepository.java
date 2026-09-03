@@ -12,7 +12,6 @@ public interface ExperienceRepository extends MongoRepository<Experience, String
 
     List<Experience> findByIsApprovedFalse();
 
-    /** Pending queue: not approved and not explicitly rejected (handles missing rejected field). */
     @Query("{ 'isApproved': false, $or: [ { 'rejected': false }, { 'rejected': null }, { 'rejected': { $exists: false } } ] }")
     List<Experience> findPendingForModeration();
 

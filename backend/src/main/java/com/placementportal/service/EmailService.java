@@ -36,7 +36,6 @@ public class EmailService {
         }
         try {
             SimpleMailMessage mail = new SimpleMailMessage();
-            // Use verified sender address instead of the authentication username if it's a provider like Brevo
             mail.setFrom(senderEmail);
             mail.setTo(toEmail);
             mail.setSubject(subject);

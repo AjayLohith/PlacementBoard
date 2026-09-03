@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-/**
- * Fails fast when required secrets / connection settings are missing (avoids obscure runtime errors).
- */
+
 @Component
 @RequiredArgsConstructor
 @Slf4j

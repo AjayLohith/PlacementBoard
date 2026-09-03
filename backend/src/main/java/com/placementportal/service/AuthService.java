@@ -70,10 +70,7 @@ public class AuthService {
                 .build();
     }
 
-    /**
-     * Sends a 6-digit OTP to the user's email when the account exists.
-     * Always succeeds from the client's perspective to avoid email enumeration.
-     */
+
     public void requestPasswordResetOtp(String rawEmail) {
         String email = rawEmail.trim().toLowerCase();
         userRepository.findByEmail(email).ifPresentOrElse(user -> {
