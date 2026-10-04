@@ -43,8 +43,8 @@ export function ForgotPasswordPage() {
         <p className="page-head__eyebrow">Recovery</p>
         <h1 className="page-head__title">Reset password</h1>
         <p className="page-head__lede">
-          We email a one-time 6-digit code to your address (valid 10 minutes). Use the Gmail account you
-          configured for the server.
+          We email a one-time 6-digit code to your address (valid 10 minutes). Enter the email address
+          associated with your account.
         </p>
       </header>
 
