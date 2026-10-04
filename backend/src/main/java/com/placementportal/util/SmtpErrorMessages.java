@@ -40,8 +40,9 @@ public final class SmtpErrorMessages {
         }
 
         if (flat.contains("could not connect") || flat.contains("connection timed out") || flat.contains("timed out")) {
-            return "Could not reach the mail server. Check host, port (587 recommended), and Render outbound connectivity."
-                    + (specificError != null ? " [Detail: " + specificError + "]" : "");
+            return "Connection timed out. Render Free Tier blocks outbound SMTP traffic (ports 25, 465, 587, 2525). "
+                    + "Please switch to Brevo's HTTP API: in Brevo, go to 'SMTP & API' → 'API Keys' tab → generate an API key (starts with 'xkeysib-'), "
+                    + "and set it in Render as BREVO_API_KEY (or EMAIL_PASS_BREVO).";
         }
 
         if (flat.contains("must issue a starttls command") || flat.contains("starttls")) {
